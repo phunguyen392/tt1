@@ -2,23 +2,26 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Category;
+use Illuminate\Database\QueryException;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class CategoryController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+        public function index()
     {
-        $query = Category::select('*');
-        $items = $query->get();
+        $items = Category::query()->paginate();
         $params = 
             [
                  'items' => $items,
             ];
         return view('admin.categories.index',$params);
+
+      
     }
 
     /**
@@ -26,7 +29,7 @@ class CategoryController extends Controller
      */
     public function create()
     {
-        //
+        return view('admin.categories.create');
     }
 
     /**
@@ -34,7 +37,21 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $items = $request->all();
+        $items = new Category();
+        $items->name = $request->name;
+        $items->description = $request->name;
+        $items->status = $request->status;
+        try
+        {
+            $items->save();
+            return redirect()->route('categories.index');
+        }
+        catch(QueryException $e)
+        {
+            Log::error($e->getMessage());
+            return redirect()->route('categories.index');
+        }
     }
 
     /**
@@ -50,7 +67,12 @@ class CategoryController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $items = Category::findOrFail($id);
+        $params =
+        [
+            'items' => $items,
+        ];
+        return view ('admin.categories.edit');
     }
 
     /**

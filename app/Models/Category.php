@@ -15,4 +15,6 @@ class Category extends Model
         'status',
     ];
     public $timestamps = false;
+    const ACTIVE = 1;
+    const INACTIVE = 0;
 }
